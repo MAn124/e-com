@@ -1,5 +1,5 @@
 <?php
-    include './config/connect.php';
+    // include './config/connect.php';
 
     function getProduct() {
         global $mysqli;
@@ -23,6 +23,7 @@
                <div class='card-body'>
                   <h5 class='card-title'>$product_title</h5>
                   <p class='card-text'>$product_description</p>
+                  <p class='card-text'>Prices: $product_prices</p>
                   <a href='index.php?add-cart=$product_id'class='btn btn-primary'>Add to cart</a>
                   <a href='product-detail.php?product_id=$product_id' class='btn btn-secondary'>View more</a>
                </div>
@@ -54,6 +55,7 @@
                <div class='card-body'>
                   <h5 class='card-title'>$product_title</h5>
                   <p class='card-text'>$product_description</p>
+                  <p class='card-text'>Prices: $product_prices</p>
                   <a href='index.php?add-cart=$product_id' class='btn btn-primary'>Add to cart</a>
                   <a href='product-detail.php?product_id=$product_id' class='btn btn-secondary'>View more</a>
                </div>
@@ -89,6 +91,7 @@
                <div class='card-body'>
                   <h5 class='card-title'>$product_title</h5>
                   <p class='card-text'>$product_description</p>
+                  <p class='card-text'>Prices: $product_prices</p>
                   <a href='index.php?add-cart=$product_id' class='btn btn-primary'>Add to cart</a>
                   <a href='product-detail.php?product_id=$product_id' class='btn btn-secondary'>View more</a>
                </div>
@@ -139,6 +142,7 @@
                <div class='card-body'>
                   <h5 class='card-title'>$product_title</h5>
                   <p class='card-text'>$product_description</p>
+                  <p class='card-text'>Prices: $product_prices</p>
                   <a href='index.php?add-cart=$product_id' class='btn btn-primary'>Add to cart</a>
                   <a href='product-detail.php?product_id=$product_id' class='btn btn-secondary'>View more</a>
                </div>
@@ -187,6 +191,8 @@
            <div class='card-body'>
               <h5 class='card-title'>$product_title</h5>
               <p class='card-text'>$product_description</p>
+              <p class='card-text'>Prices: $product_prices</p>
+
               <a href='index.php?add-cart=$product_id' class='btn btn-primary'>Add to cart</a>
               <a href='index.php' class='btn btn-secondary'>Return</a>
            </div>
@@ -253,6 +259,7 @@
                <div class='card-body'>
                   <h5 class='card-title'>$product_title</h5>
                   <p class='card-text'>$product_description</p>
+                  <p class='card-text'>Prices: $product_prices</p>
                   <a href='index.php?add-cart=$product_id' class='btn btn-primary'>Add to cart</a>
                   <a href='product-detail.php?product_id=$product_id' class='btn btn-secondary'>View more</a>
                </div>
@@ -300,6 +307,49 @@
                      $count_cart_item = mysqli_num_rows($result_query);                    
                 }
                    echo  $count_cart_item;
+            }
+            
+            function total_price() {
+                global $mysqli;
+                $ip = getIPAddress();
+                $total = 0;
+                $cart_query = "SELECT * FROM cart_detail WHERE ip_address = '$ip'";
+                $result = mysqli_query($mysqli, $cart_query) or die(mysqli_error($mysqli));
+                while($row = mysqli_fetch_array($result)){
+                    $product_id = $row['product_id'];
+                    $select_product = "SELECT * FROM products WHERE product_id = '$product_id'";
+                    $result_select = mysqli_query($mysqli, $select_product) or die(mysqli_error($mysqli));
+                    while($row_prices = mysqli_fetch_array($result_select)){
+                        $product_price = array($row_prices['product_prices']);
+                        $product_value = array_sum($product_price);
+                        $total+=$product_value;
+                    }
+                }
+                echo $total;
+            }
+
+            // 
+            function get_user_cart_item() {
+                global $mysqli;
+                $username = $_SESSION['username'];
+                $get_detail = "SELECT * FROM user WHERE user_name = '$username'";
+                $result_query = mysqli_query($mysqli, $get_detail) or die(mysqli_error($mysqli));
+                while($row_query= mysqli_fetch_array($result_query)){
+                    $user_id = $row_query['user_id'];
+                    if(!isset($_GET['edit_account'])) {
+                        if(!isset($_GET['my_orders'])) {
+                            if(!isset($_GET['delete_account'])) {
+                                $get_orders = "SELECT * FROM order WHERE user_id = $user_id AND order_status = 'pending'";
+                                $result_order = mysqli_query($mysqli, $get_orders) or die(mysqli_error($mysqli));
+                                $row_count = mysqli_num_rows($result_order);
+                                if($row_count > 0) {
+                                    echo "<h3>Hi</h3>";
+                                   
+                                }
+                            }
+                        }
+                    }
+                }
             }
             
 ?>
